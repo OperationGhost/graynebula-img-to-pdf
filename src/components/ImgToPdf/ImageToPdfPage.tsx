@@ -84,18 +84,18 @@ function SortableItem({ id, src, onRemove, onRotate, index, onPreview }: Sortabl
             {...listeners}
             className={`
         relative cursor-grab active:cursor-grabbing
-        bg-gradient-to-br from-slate-800/50 to-slate-900/50
-        backdrop-blur-sm border border-slate-700/50
+        bg-gradient-to-br from-neutral-900/90 to-black
+        backdrop-blur-sm border border-white/10
         rounded-xl overflow-hidden shadow-lg hover:shadow-xl
         ${isDragging ? 'opacity-70 shadow-2xl' : ''}
       `}
         >
-            <div className="flex items-center justify-between gap-2 p-3 bg-slate-950/80 border-b border-slate-700/50">
+            <div className="flex items-center justify-between gap-2 p-3 bg-black/80 border-b border-white/10">
                 <button
                     type="button"
                     className="
             w-7 h-7
-            bg-slate-700/80 hover:bg-slate-600
+            bg-white/10 hover:bg-white/20
             rounded-full flex items-center justify-center
             text-white shadow-lg hover:shadow-xl
             transition-all duration-200 hover:scale-110
@@ -114,7 +114,7 @@ function SortableItem({ id, src, onRemove, onRotate, index, onPreview }: Sortabl
                     disabled={isRotating}
                     className="
             w-7 h-7
-            bg-blue-600/80 hover:bg-blue-500 disabled:opacity-60
+            bg-white/10 hover:bg-white/20 disabled:opacity-60
             rounded-full flex items-center justify-center
             text-white shadow-lg hover:shadow-xl
             transition-all duration-200 hover:scale-110
@@ -134,7 +134,7 @@ function SortableItem({ id, src, onRemove, onRotate, index, onPreview }: Sortabl
                     onPointerDown={(e) => e.stopPropagation()}
                     className="
             w-7 h-7
-            bg-red-500/90 hover:bg-red-600
+            bg-white/10 hover:bg-white/20
             rounded-full flex items-center justify-center
             text-white shadow-lg hover:shadow-xl
             transition-all duration-200 hover:scale-110
@@ -147,7 +147,7 @@ function SortableItem({ id, src, onRemove, onRotate, index, onPreview }: Sortabl
             </div>
 
             <div
-                className="relative overflow-hidden rounded-b-xl bg-slate-800/30 h-48 w-full group cursor-grab active:cursor-grabbing"
+                className="relative overflow-hidden rounded-b-xl bg-neutral-900/50 h-48 w-full group cursor-grab active:cursor-grabbing"
                 onClick={() => onPreview(index)}
             >
                 <img
@@ -353,24 +353,24 @@ export default function ImageToPdfPage() {
     return (
         <>
         <HomeNavbar />
-        <div className="min-h-screen  from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden">
+        <div className="min-h-screen bg-black text-white relative overflow-hidden">
             {/* Background decoration */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.04),transparent_50%)]" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white/[0.02] rounded-full blur-3xl" />
 
             <div className="relative z-10 container mx-auto px-6 py-12">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-slate-700/50 rounded-full px-6 py-3 mb-6">
-                        <FiImage className="text-blue-400" size={24} />
-                        <span className="text-slate-300 font-medium">Image to PDF Converter</span>
+                    <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3 mb-6">
+                        <FiImage className="text-white" size={24} />
+                        <span className="text-neutral-300 font-medium">Image to PDF Converter</span>
                     </div>
 
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-4">
+                    <h1 className="text-5xl font-bold text-white mb-4">
                         Transform Images into PDFs
                     </h1>
-                    <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+                    <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
                         Upload your images, arrange them in any order, and generate a professional PDF document in seconds.
                     </p>
                 </div>
@@ -380,8 +380,8 @@ export default function ImageToPdfPage() {
                     className={`
             relative mb-8 border-2 rounded-2xl transition-all duration-300
             ${dragOver
-                            ? 'border-blue-400 bg-blue-500/10 scale-105'
-                            : 'border-slate-600 hover:border-slate-500 hover:bg-slate-800/30'
+                            ? 'border-white bg-white/5 scale-105'
+                            : 'border-neutral-700 hover:border-neutral-500 hover:bg-white/[0.03]'
                         }
           `}
                     onDragOver={handleDragOver}
@@ -415,13 +415,13 @@ export default function ImageToPdfPage() {
                                 </DndContext>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-700/50 bg-slate-950/85 p-6 flex flex-col justify-between gap-6">
+                            <div className="rounded-3xl border border-white/10 bg-black/85 p-6 flex flex-col justify-between gap-6">
                                 <div>
-                                    <div className="inline-flex items-center gap-3 rounded-full bg-blue-500/10 px-4 py-2 text-sm text-blue-100 mb-5">
+                                    <div className="inline-flex items-center gap-3 rounded-full bg-white/5 px-4 py-2 text-sm text-neutral-100 mb-5">
                                         <FiUpload size={18} />
                                         <span className="font-medium">Add more images</span>
                                     </div>
-                                    <p className="text-slate-400 mb-6">
+                                    <p className="text-neutral-400 mb-6">
                                         Upload additional images to extend your PDF. Reorder pages by dragging thumbnails.
                                     </p>
                                     <input
@@ -434,28 +434,28 @@ export default function ImageToPdfPage() {
                                     />
                                     <label
                                         htmlFor="file-upload"
-                                        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition-all duration-200 hover:scale-[1.02] cursor-pointer"
+                                        className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black shadow-lg shadow-white/10 transition-all duration-200 hover:scale-[1.02] hover:bg-neutral-200 cursor-pointer"
                                     >
                                         <FiUpload size={18} />
                                         Add more images
                                     </label>
                                 </div>
 
-                                <div className="rounded-3xl border border-slate-700/20 bg-slate-900/70 p-4 text-slate-300">
-                                    <p className="text-sm font-semibold text-slate-100 mb-2">Tip</p>
+                                <div className="rounded-3xl border border-white/10 bg-neutral-900/70 p-4 text-neutral-300">
+                                    <p className="text-sm font-semibold text-white mb-2">Tip</p>
                                     <p className="text-sm leading-6">
-                                        Use the red icon to remove an image, the blue icon to rotate it, and drag to reorder pages before download.
+                                        Use the remove and rotate icons to edit images, and drag to reorder pages before download.
                                     </p>
                                 </div>
                             </div>
                         </div>
                     ) : (
                         <div className="p-12 text-center">
-                            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white text-black">
                                 <FiUpload size={28} />
                             </div>
                             <h3 className="text-2xl font-semibold mb-2">Drop your images here</h3>
-                            <p className="text-slate-400 mb-6">Upload images to arrange them before converting to PDF.</p>
+                            <p className="text-neutral-400 mb-6">Upload images to arrange them before converting to PDF.</p>
 
                             <input
                                 type="file"
@@ -467,7 +467,7 @@ export default function ImageToPdfPage() {
                             />
                             <label
                                 htmlFor="file-upload"
-                                className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition-all duration-200 hover:scale-[1.02] cursor-pointer"
+                                className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-white/10 transition-all duration-200 hover:scale-[1.02] hover:bg-neutral-200 cursor-pointer"
                             >
                                 <FiUpload size={18} />
                                 Choose Images
@@ -478,8 +478,8 @@ export default function ImageToPdfPage() {
                     {loading && (
                         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                             <div className="text-center">
-                                <div className="w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                                <p className="text-slate-300">Processing images...</p>
+                                <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                                <p className="text-neutral-300">Processing images...</p>
                             </div>
                         </div>
                     )}
@@ -487,9 +487,9 @@ export default function ImageToPdfPage() {
 
                 {/* Controls */}
                 {images.length > 0 && (
-                    <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-6 bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl">
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-6 bg-neutral-900/70 backdrop-blur-sm border border-white/10 rounded-xl">
                         <div className="flex items-center gap-4">
-                            <span className="text-slate-300 font-medium">Orientation:</span>
+                            <span className="text-neutral-300 font-medium">Orientation:</span>
                             <div className="flex items-center gap-2" role="group" aria-label="Page orientation">
                                 <button
                                     type="button"
@@ -497,8 +497,8 @@ export default function ImageToPdfPage() {
                                     aria-pressed={orientation === "p"}
                                     className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors duration-200 ${
                                         orientation === "p"
-                                            ? "border-blue-500 bg-blue-500/20 text-white"
-                                            : "border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                        ? "border-white bg-white text-black"
+                                        : "border-white/20 bg-neutral-900 text-neutral-300 hover:bg-neutral-800"
                                     }`}
                                 >
                                     <MdOutlineCropPortrait aria-hidden="true" size={20} />
@@ -510,8 +510,8 @@ export default function ImageToPdfPage() {
                                     aria-pressed={orientation === "l"}
                                     className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors duration-200 ${
                                         orientation === "l"
-                                            ? "border-blue-500 bg-blue-500/20 text-white"
-                                            : "border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                        ? "border-white bg-white text-black"
+                                        : "border-white/20 bg-neutral-900 text-neutral-300 hover:bg-neutral-800"
                                     }`}
                                 >
                                     <MdOutlineCropLandscape aria-hidden="true" size={20} />
@@ -521,15 +521,15 @@ export default function ImageToPdfPage() {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <span className="text-slate-400 text-sm">
+                            <span className="text-neutral-400 text-sm">
                                 {images.length} image{images.length !== 1 ? 's' : ''} selected
                             </span>
                             <button
                                 onClick={() => setImages([])}
                                 className="
-                  px-4 py-2 bg-red-600/20 hover:bg-red-600/30
-                  border border-red-500/30 rounded-lg text-red-400
-                  hover:text-red-300 transition-colors duration-200
+                  px-4 py-2 bg-white/5 hover:bg-white/10
+                  border border-white/15 rounded-lg text-neutral-200
+                  hover:text-white transition-colors duration-200
                   flex items-center gap-2
                 "
                             >
@@ -548,9 +548,8 @@ export default function ImageToPdfPage() {
                             disabled={loading}
                             className="
                 download-btn px-8 py-4 text-lg font-semibold
-                bg-gradient-to-r from-green-600 to-emerald-600
-                hover:from-green-700 hover:to-emerald-700
-                disabled:from-gray-600 disabled:to-gray-600
+                bg-white text-black hover:bg-neutral-200
+                disabled:bg-neutral-600 disabled:text-neutral-300
                 rounded-xl shadow-lg hover:shadow-xl
                 transition-all duration-200 hover:scale-105
                 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
@@ -575,11 +574,11 @@ export default function ImageToPdfPage() {
                 {/* Empty State */}
                 {images.length === 0 && !loading && (
                     <div className="text-center py-2">
-                        <div className="w-24 h-24 bg-gradient-to-r from-slate-700 to-slate-600 rounded-full flex items-center justify-center mx-auto">
-                            <FiImage size={32} className="text-slate-400" />
+                        <div className="w-24 h-24 bg-neutral-800 rounded-full flex items-center justify-center mx-auto">
+                            <FiImage size={32} className="text-neutral-300" />
                         </div>
-                        <h3 className="text-xl font-semibold text-slate-300 mb-2">No images uploaded yet</h3>
-                        <p className="text-slate-500">Upload some images to get started</p>
+                        <h3 className="text-xl font-semibold text-neutral-300 mb-2">No images uploaded yet</h3>
+                        <p className="text-neutral-400">Upload some images to get started</p>
                     </div>
                 )}
 
@@ -590,7 +589,7 @@ export default function ImageToPdfPage() {
                             {/* Close button */}
                             <button
                                 onClick={closePreview}
-                                className="absolute -top-12 right-0 w-10 h-10 bg-slate-800/80 hover:bg-slate-700 rounded-full flex items-center justify-center text-white transition-colors duration-200"
+                                className="absolute -top-12 right-0 w-10 h-10 bg-neutral-900/80 hover:bg-neutral-700 rounded-full flex items-center justify-center text-white transition-colors duration-200"
                                 aria-label="Close preview"
                             >
                                 <FiX size={20} />
@@ -601,14 +600,14 @@ export default function ImageToPdfPage() {
                                 <>
                                     <button
                                         onClick={prevImage}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-slate-800/80 hover:bg-slate-700 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-neutral-900/80 hover:bg-neutral-700 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
                                         aria-label="Previous image"
                                     >
                                         <FiChevronLeft size={24} />
                                     </button>
                                     <button
                                         onClick={nextImage}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-slate-800/80 hover:bg-slate-700 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-neutral-900/80 hover:bg-neutral-700 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
                                         aria-label="Next image"
                                     >
                                         <FiChevronRight size={24} />

@@ -21,7 +21,7 @@ export default function HeroSection() {
   return (
     <section className="relative bg-black text-white py-14 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6">
-        <p className="text-base sm:text-xl mb-10 sm:mb-12 text-center text-gray-300">
+        <p className="text-base sm:text-xl mb-10 sm:mb-12 text-center text-neutral-300">
           Your gateway to cutting-edge utilities, extensions, and projects.
         </p>
 
@@ -32,9 +32,9 @@ export default function HeroSection() {
               href={item.href}
               className="group block"
             >
-              <div className="bg-gray-800 hover:bg-gray-700 transition-all duration-300 rounded-lg p-4 sm:p-5 md:p-6 flex flex-col items-center justify-center aspect-square border border-gray-700 hover:border-blue-500 group-hover:scale-105">
-                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{item.icon}</div>
-                <h3 className="text-xs sm:text-sm font-medium text-center text-gray-300 group-hover:text-white transition-colors duration-300">
+              <div className="bg-neutral-900 hover:bg-neutral-800 transition-all duration-300 rounded-lg p-4 sm:p-5 md:p-6 flex flex-col items-center justify-center aspect-square border border-neutral-700 hover:border-white group-hover:scale-105">
+                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3 grayscale">{item.icon}</div>
+                <h3 className="text-xs sm:text-sm font-medium text-center text-neutral-300 group-hover:text-white transition-colors duration-300">
                   {item.label}
                 </h3>
               </div>
