@@ -29,6 +29,37 @@ export const compressImage = (
   });
 };
 
+export const rotateImage = (src: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.height;
+        canvas.height = img.width;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Unable to create a canvas context to rotate the image."));
+          return;
+        }
+
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(Math.PI / 2);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.9));
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    img.onerror = () => reject(new Error("Failed to load the image for rotation."));
+    img.src = src;
+  });
+};
+
 export const generatePDF = async (
   images: string[],
   orientation: "p" | "l"

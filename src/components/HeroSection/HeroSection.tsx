@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HeroSection() {
   const items = [
-    { label: "Image to pdf", href: "/image-to-pdf", icon: "🖼️" },
+    { label: "Image to pdf", href: "/", icon: "🖼️" },
     { label: "API Tools", href: "/", icon: "🔗" },
     { label: "File Converter", href: "/", icon: "📄" },
     { label: "Color Picker", href: "/", icon: "🎨" },

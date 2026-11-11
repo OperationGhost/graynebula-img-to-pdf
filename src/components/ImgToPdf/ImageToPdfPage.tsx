@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { compressImage, generatePDF } from "@/components/ImgToPdf/ImgToPdf";
+import { compressImage, generatePDF, rotateImage } from "@/components/ImgToPdf/ImgToPdf";
 import {
     FiUpload,
     FiDownload,
@@ -10,37 +10,71 @@ import {
     FiGrid,
     FiList,
     FiChevronLeft,
-    FiChevronRight
+    FiChevronRight,
+    FiRotateCw,
 } from "react-icons/fi";
+import {
+    MdOutlineCropLandscape,
+    MdOutlineCropPortrait,
+} from "react-icons/md";
 
 import {
     DndContext,
     closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
 } from "@dnd-kit/core";
 
 import {
     SortableContext,
     useSortable,
     arrayMove,
-    verticalListSortingStrategy,
+    rectSortingStrategy,
+    sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 
 import { CSS } from "@dnd-kit/utilities";
 import HomeNavbar from "@/components/HomeNavbar/HomeNavbar";
 
-// Sortable item component
-function SortableItem({ id, src, onRemove, index, onPreview }: any) {
-    const { attributes, listeners, setNodeRef, transform, isDragging } =
+type UploadedImage = {
+    id: string;
+    src: string;
+};
+
+type SortableItemProps = {
+    id: string;
+    src: string;
+    index: number;
+    onRemove: () => void;
+    onRotate: () => Promise<void>;
+    onPreview: (index: number) => void;
+};
+
+function SortableItem({ id, src, onRemove, onRotate, index, onPreview }: SortableItemProps) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
         useSortable({ id });
+    const [isRotating, setIsRotating] = useState(false);
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition: isDragging ? "none" : "transform 150ms ease-out",
+        transition,
         height: "fit-content",
+        zIndex: isDragging ? 1 : undefined,
     };
 
-    useEffect(() => {
-        // No animation library used for sorting items.
-    }, [isDragging]);
+    const handleRotate = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        if (isRotating) return;
+
+        setIsRotating(true);
+        try {
+            await onRotate();
+        } finally {
+            setIsRotating(false);
+        }
+    };
 
     return (
         <div
@@ -49,17 +83,15 @@ function SortableItem({ id, src, onRemove, index, onPreview }: any) {
             {...attributes}
             {...listeners}
             className={`
-        relative cursor-default
+        relative cursor-grab active:cursor-grabbing
         bg-gradient-to-br from-slate-800/50 to-slate-900/50
         backdrop-blur-sm border border-slate-700/50
         rounded-xl overflow-hidden shadow-lg hover:shadow-xl
-        ${isDragging ? 'opacity-50 scale-105 shadow-2xl' : ''}
+        ${isDragging ? 'opacity-70 shadow-2xl' : ''}
       `}
         >
             <div className="flex items-center justify-between gap-2 p-3 bg-slate-950/80 border-b border-slate-700/50">
                 <button
-                    {...attributes}
-                    {...listeners}
                     type="button"
                     className="
             w-7 h-7
@@ -73,6 +105,24 @@ function SortableItem({ id, src, onRemove, index, onPreview }: any) {
                     aria-label="Drag to reorder"
                 >
                     <FiList size={16} />
+                </button>
+
+                <button
+                    type="button"
+                    onClick={handleRotate}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    disabled={isRotating}
+                    className="
+            w-7 h-7
+            bg-blue-600/80 hover:bg-blue-500 disabled:opacity-60
+            rounded-full flex items-center justify-center
+            text-white shadow-lg hover:shadow-xl
+            transition-all duration-200 hover:scale-110
+          "
+                    aria-label="Rotate image 90 degrees clockwise"
+                    title="Rotate 90° clockwise"
+                >
+                    <FiRotateCw size={15} className={isRotating ? "animate-spin" : ""} />
                 </button>
 
                 <button
@@ -97,12 +147,13 @@ function SortableItem({ id, src, onRemove, index, onPreview }: any) {
             </div>
 
             <div
-                className="relative overflow-hidden rounded-b-xl bg-slate-800/30 h-48 w-full group cursor-pointer"
+                className="relative overflow-hidden rounded-b-xl bg-slate-800/30 h-48 w-full group cursor-grab active:cursor-grabbing"
                 onClick={() => onPreview(index)}
             >
                 <img
                     src={src}
                     alt={`Image ${index + 1}`}
+                    draggable={false}
                     className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -119,11 +170,15 @@ function SortableItem({ id, src, onRemove, index, onPreview }: any) {
 }
 
 export default function ImageToPdfPage() {
-    const [images, setImages] = useState<string[]>([]);
+    const [images, setImages] = useState<UploadedImage[]>([]);
     const [orientation, setOrientation] = useState<"p" | "l">("p");
     const [loading, setLoading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
     const [previewModal, setPreviewModal] = useState({ isOpen: false, currentIndex: 0 });
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
 
     const openPreview = (index: number) => {
         setPreviewModal({ isOpen: true, currentIndex: index });
@@ -180,8 +235,8 @@ export default function ImageToPdfPage() {
         };
     }, [previewModal.isOpen, previewModal.currentIndex]);
 
-    const handleUpload = async (e: any) => {
-        const files = Array.from(e.target.files);
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files ?? []);
         if (files.length === 0) return;
 
         // Clear the input value to allow re-uploading the same files
@@ -191,13 +246,16 @@ export default function ImageToPdfPage() {
         try {
             // Process files in batches to avoid overwhelming the browser
             const batchSize = 10;
-            const compressed: string[] = [];
+            const compressed: UploadedImage[] = [];
 
             for (let i = 0; i < files.length; i += batchSize) {
                 const batch = files.slice(i, i + batchSize);
-                const batchCompressed = await Promise.all(
-                    batch.map((file: any) => compressImage(file, 0.7))
-                );
+                const batchCompressed = (await Promise.all(
+                    batch.map((file) => compressImage(file, 0.7))
+                )).map((src) => ({
+                    id: crypto.randomUUID(),
+                    src,
+                }));
                 compressed.push(...batchCompressed);
 
                 // Update progress for large uploads
@@ -216,14 +274,17 @@ export default function ImageToPdfPage() {
         }
     };
 
-    const handleDragEnd = (event: any) => {
-        const { active, over } = event;
+    const handleDragEnd = ({ active, over }: DragEndEvent) => {
         if (!over || active.id === over.id) return;
 
-        const oldIndex = parseInt(active.id.split('-')[1]);
-        const newIndex = parseInt(over.id.split('-')[1]);
+        setImages((currentImages) => {
+            const oldIndex = currentImages.findIndex((image) => image.id === active.id);
+            const newIndex = currentImages.findIndex((image) => image.id === over.id);
 
-        setImages(arrayMove(images, oldIndex, newIndex));
+            if (oldIndex < 0 || newIndex < 0) return currentImages;
+
+            return arrayMove(currentImages, oldIndex, newIndex);
+        });
     };
 
     const handleDownload = async () => {
@@ -231,11 +292,25 @@ export default function ImageToPdfPage() {
 
         setLoading(true);
         try {
-            await generatePDF(images, orientation);
+            await generatePDF(images.map((image) => image.src), orientation);
         } catch (error) {
             console.error("Error generating PDF:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleRotate = async (id: string) => {
+        const image = images.find((item) => item.id === id);
+        if (!image) return;
+
+        try {
+            const src = await rotateImage(image.src);
+            setImages((current) =>
+                current.map((item) => item.id === id ? { ...item, src } : item)
+            );
+        } catch (error) {
+            console.error("Error rotating image:", error);
         }
     };
 
@@ -262,9 +337,12 @@ export default function ImageToPdfPage() {
         setLoading(true);
         try {
             const compressed = await Promise.all(
-                files.map((file: any) => compressImage(file, 0.7))
+                files.map((file) => compressImage(file, 0.7))
             );
-            setImages((prev) => [...prev, ...compressed]);
+            setImages((prev) => [
+                ...prev,
+                ...compressed.map((src) => ({ id: crypto.randomUUID(), src })),
+            ]);
         } catch (error) {
             console.error("Error compressing images:", error);
         } finally {
@@ -313,15 +391,23 @@ export default function ImageToPdfPage() {
                     {images.length > 0 ? (
                         <div className="grid gap-6 lg:grid-cols-[1.8fr_0.95fr] p-6">
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
-                                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                                    <SortableContext items={images.map((_, index) => `image-${index}`)} strategy={verticalListSortingStrategy}>
-                                        {images.map((img, index) => (
+                                <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={handleDragEnd}
+                                >
+                                    <SortableContext
+                                        items={images.map((image) => image.id)}
+                                        strategy={rectSortingStrategy}
+                                    >
+                                        {images.map((image, index) => (
                                             <SortableItem
-                                                key={`image-${index}`}
-                                                id={`image-${index}`}
-                                                src={img}
+                                                key={image.id}
+                                                id={image.id}
+                                                src={image.src}
                                                 index={index}
-                                                onRemove={() => setImages(images.filter((_, i) => i !== index))}
+                                                onRemove={() => setImages((current) => current.filter((item) => item.id !== image.id))}
+                                                onRotate={() => handleRotate(image.id)}
                                                 onPreview={openPreview}
                                             />
                                         ))}
@@ -358,7 +444,7 @@ export default function ImageToPdfPage() {
                                 <div className="rounded-3xl border border-slate-700/20 bg-slate-900/70 p-4 text-slate-300">
                                     <p className="text-sm font-semibold text-slate-100 mb-2">Tip</p>
                                     <p className="text-sm leading-6">
-                                        Click the red icon to remove an image. Drag the handle to reorder pages before download.
+                                        Use the red icon to remove an image, the blue icon to rotate it, and drag to reorder pages before download.
                                     </p>
                                 </div>
                             </div>
@@ -404,18 +490,34 @@ export default function ImageToPdfPage() {
                     <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-6 bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl">
                         <div className="flex items-center gap-4">
                             <span className="text-slate-300 font-medium">Orientation:</span>
-                            <select
-                                value={orientation}
-                                onChange={(e) => setOrientation(e.target.value as any)}
-                                className="
-                  px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg
-                  text-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                  transition-colors duration-200
-                "
-                            >
-                                <option value="p">📄 Portrait</option>
-                                <option value="l">📊 Landscape</option>
-                            </select>
+                            <div className="flex items-center gap-2" role="group" aria-label="Page orientation">
+                                <button
+                                    type="button"
+                                    onClick={() => setOrientation("p")}
+                                    aria-pressed={orientation === "p"}
+                                    className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors duration-200 ${
+                                        orientation === "p"
+                                            ? "border-blue-500 bg-blue-500/20 text-white"
+                                            : "border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                    }`}
+                                >
+                                    <MdOutlineCropPortrait aria-hidden="true" size={20} />
+                                    Portrait
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setOrientation("l")}
+                                    aria-pressed={orientation === "l"}
+                                    className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 transition-colors duration-200 ${
+                                        orientation === "l"
+                                            ? "border-blue-500 bg-blue-500/20 text-white"
+                                            : "border-slate-600 bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                    }`}
+                                >
+                                    <MdOutlineCropLandscape aria-hidden="true" size={20} />
+                                    Landscape
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-4">
@@ -517,7 +619,7 @@ export default function ImageToPdfPage() {
                             {/* Image */}
                             <div className="relative">
                                 <img
-                                    src={images[previewModal.currentIndex]}
+                                    src={images[previewModal.currentIndex].src}
                                     alt={`Preview ${previewModal.currentIndex + 1}`}
                                     className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
                                 />
